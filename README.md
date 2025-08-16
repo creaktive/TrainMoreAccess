@@ -27,4 +27,4 @@ Unauthorized use may violate laws or terms of service.
 4. On the iPhone, open http://mitm.it/#iOS and install the generated CA certificate.
 5. Open the TrainMore app and display the access QR code (or trigger the network activity you want to inspect).
 6. On the desktop running mitmproxy, you should now see the request captured - including headers with tokens.
-7. Add your tokens to the [TrainMoreAccess Watch App/ContentView.swift](TrainMoreAccess Watch App/ContentView.swift) file.
+7. Add your tokens to the `TrainMoreAccess Watch App/ContentView.swift`.
