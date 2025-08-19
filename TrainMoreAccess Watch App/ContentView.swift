@@ -44,7 +44,11 @@ final class ImageLoader: ObservableObject {
 
             var comps = URLComponents(string: "https://api.qrserver.com/v1/create-qr-code/")!
             comps.queryItems = [
+                .init(name: "bgcolor", value: "000"),
+                .init(name: "color", value: "fff"),
+                .init(name: "data", value: content),
                 .init(name: "format", value: "png"),
+                .init(name: "margin", value: "50"),
                 .init(name: "size", value: "500x500"),
                 .init(name: "color", value: "fff"),
                 .init(name: "bgcolor", value: "000"),
@@ -97,7 +101,7 @@ struct ContentView: View {
                     .foregroundStyle(.secondary)
             }
         }
-        .padding()
+        .ignoresSafeArea(.all)
         .task { await loader.fetch() }
         .onReceive(timer) { _ in
             Task { await loader.fetch() }
