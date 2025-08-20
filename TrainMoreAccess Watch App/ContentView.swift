@@ -44,15 +44,10 @@ final class ImageLoader: ObservableObject {
 
             var comps = URLComponents(string: "https://api.qrserver.com/v1/create-qr-code/")!
             comps.queryItems = [
-                .init(name: "bgcolor", value: "000"),
-                .init(name: "color", value: "fff"),
                 .init(name: "data", value: content),
                 .init(name: "format", value: "png"),
-                .init(name: "margin", value: "50"),
+                .init(name: "margin", value: "20"),
                 .init(name: "size", value: "500x500"),
-                .init(name: "color", value: "fff"),
-                .init(name: "bgcolor", value: "000"),
-                .init(name: "data", value: content)
             ]
             guard let qrURL = comps.url else { throw URLError(.badURL) }
 
@@ -82,18 +77,18 @@ struct ContentView: View {
     private let timer = Timer.publish(every: 30, on: .main, in: .common).autoconnect()
 
     var body: some View {
-        VStack(spacing: 0) {
+        VStack() {
             Group {
                 if let img = loader.image {
                     Image(uiImage: img)
                         .resizable()
                         .scaledToFit()
-                        .clipShape(RoundedRectangle(cornerRadius: 8))
                 } else {
                     ProgressView("Loading…")
                 }
             }
             .frame(maxWidth: .infinity, maxHeight: .infinity)
+            .padding(.top, 20)
 
             if let ts = loader.lastUpdated {
                 Text("Updated \(ts.formatted(date: .omitted, time: .standard))")
