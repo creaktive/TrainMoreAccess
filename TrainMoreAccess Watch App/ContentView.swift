@@ -16,8 +16,14 @@ final class ImageLoader: ObservableObject {
     @Published var image: UIImage?
 
     private let API_ENDPOINT = "https://my.trainmore.nl/nox/v1/customerqrcode/"
-    private let PUBLIC_FACILITY_GROUP = "BRANDEDAPPTMBTYDONOTDELETE-..."
-    private let AUTH_TOKEN = "..."
+
+    var publicFacilityGroup: String
+    var authToken: String
+
+    init(publicFacilityGroup: String, authToken: String) {
+        self.publicFacilityGroup = publicFacilityGroup
+        self.authToken = authToken
+    }
 
     struct QRContentResponse: Decodable {
         let content: String?
@@ -31,8 +37,8 @@ final class ImageLoader: ObservableObject {
         req1.setValue("3.72.1", forHTTPHeaderField: "x-nox-client-version")
         req1.setValue("APP_V5", forHTTPHeaderField: "x-nox-client-type")
         req1.setValue("en", forHTTPHeaderField: "accept-language")
-        req1.setValue(PUBLIC_FACILITY_GROUP, forHTTPHeaderField: "x-public-facility-group")
-        req1.setValue(AUTH_TOKEN, forHTTPHeaderField: "x-auth-token")
+        req1.setValue(publicFacilityGroup, forHTTPHeaderField: "x-public-facility-group")
+        req1.setValue(authToken, forHTTPHeaderField: "x-auth-token")
 
         do {
             let (jsonData, resp1) = try await URLSession.shared.data(for: req1)
@@ -53,9 +59,12 @@ final class ImageLoader: ObservableObject {
     }
 }
 
-
 struct ContentView: View {
-    @StateObject private var loader = ImageLoader()
+    @AppStorage("publicFacilityGroup") private var publicFacilityGroup = "..."
+    @AppStorage("authToken") private var authToken = "..."
+
+    @StateObject private var loader = ImageLoader(publicFacilityGroup: "", authToken: "")
+    @State private var showingSettings = false
     private let timer = Timer.publish(every: 30, on: .main, in: .common).autoconnect()
 
     @State private var timeRemaining: Double = 30.0
@@ -75,6 +84,9 @@ struct ContentView: View {
             }
             .frame(maxWidth: .infinity, maxHeight: .infinity)
             .padding(.top, 15)
+            .onTapGesture(count: 2) {
+                showingSettings = true
+            }
 
             VStack() {
                 ProgressView(value: timeRemaining, total: reloadInterval)
@@ -84,10 +96,12 @@ struct ContentView: View {
         }
         .ignoresSafeArea(.all)
         .task {
+            updateLoaderTokens()
             await loader.fetch()
             timeRemaining = reloadInterval
         }
         .onReceive(timer) { _ in
+            updateLoaderTokens()
             Task { await loader.fetch() }
             timeRemaining = reloadInterval
         }
@@ -96,5 +110,13 @@ struct ContentView: View {
                 timeRemaining -= 0.01
             }
         }
+        .sheet(isPresented: $showingSettings) {
+            SettingsView(publicFacilityGroup: $publicFacilityGroup, authToken: $authToken)
+        }
+    }
+
+    private func updateLoaderTokens() {
+        loader.publicFacilityGroup = publicFacilityGroup
+        loader.authToken = authToken
     }
 }
