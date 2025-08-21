@@ -41,10 +41,12 @@ final class ImageLoader: ObservableObject {
             }
             let decoded = try JSONDecoder().decode(QRContentResponse.self, from: jsonData)
 
-            let doc = try QRCode.Document(utf8String: decoded.content ?? "")
-            let pngData = try doc.pngData(dimension: 500)
+            let image = try QRCode.build
+                .text(decoded.content ?? "")
+                .errorCorrection(QRCode.ErrorCorrection.low)
+                .generate.image(dimension: 500, representation: .png())
 
-            self.image = UIImage(data: pngData)
+            self.image = UIImage(data: image)
         } catch {
             print("Access code fetch failed:", error)
         }
