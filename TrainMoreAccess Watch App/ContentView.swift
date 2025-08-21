@@ -76,6 +76,10 @@ struct ContentView: View {
     @StateObject private var loader = ImageLoader()
     private let timer = Timer.publish(every: 30, on: .main, in: .common).autoconnect()
 
+    @State private var timeRemaining: Double = 30.0
+    private let reloadInterval: Double = 30.0
+    private let progressTimer = Timer.publish(every: 0.01, on: .main, in: .common).autoconnect()
+
     var body: some View {
         VStack() {
             Group {
@@ -88,18 +92,27 @@ struct ContentView: View {
                 }
             }
             .frame(maxWidth: .infinity, maxHeight: .infinity)
-            .padding(.top, 20)
+            .padding(.top, 15)
 
-            if let ts = loader.lastUpdated {
-                Text("Updated \(ts.formatted(date: .omitted, time: .standard))")
-                    .font(.footnote)
-                    .foregroundStyle(.secondary)
+            VStack() {
+                ProgressView(value: timeRemaining, total: reloadInterval)
+                    .progressViewStyle(LinearProgressViewStyle())
             }
+            .padding(.horizontal, 50)
         }
         .ignoresSafeArea(.all)
-        .task { await loader.fetch() }
+        .task {
+            await loader.fetch()
+            timeRemaining = reloadInterval
+        }
         .onReceive(timer) { _ in
             Task { await loader.fetch() }
+            timeRemaining = reloadInterval
+        }
+        .onReceive(progressTimer) { _ in
+            if timeRemaining > 0 {
+                timeRemaining -= 0.01
+            }
         }
     }
 }
