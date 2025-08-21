@@ -7,13 +7,13 @@
 
 import Combine
 import Foundation
+import QRCode
 import SwiftUI
 import UIKit
 
 @MainActor
 final class ImageLoader: ObservableObject {
     @Published var image: UIImage?
-    @Published var lastUpdated: Date?
 
     private let API_ENDPOINT = "https://my.trainmore.nl/nox/v1/customerqrcode/"
     private let PUBLIC_FACILITY_GROUP = "BRANDEDAPPTMBTYDONOTDELETE-..."
@@ -40,33 +40,13 @@ final class ImageLoader: ObservableObject {
                 throw URLError(.badServerResponse)
             }
             let decoded = try JSONDecoder().decode(QRContentResponse.self, from: jsonData)
-            let content = decoded.content ?? ""
 
-            var comps = URLComponents(string: "https://api.qrserver.com/v1/create-qr-code/")!
-            comps.queryItems = [
-                .init(name: "data", value: content),
-                .init(name: "format", value: "png"),
-                .init(name: "margin", value: "20"),
-                .init(name: "size", value: "500x500"),
-            ]
-            guard let qrURL = comps.url else { throw URLError(.badURL) }
+            let doc = try QRCode.Document(utf8String: decoded.content ?? "")
+            let pngData = try doc.pngData(dimension: 500)
 
-            var req2 = URLRequest(url: qrURL)
-            req2.httpMethod = "GET"
-            req2.cachePolicy = .reloadIgnoringLocalCacheData
-
-            let (pngData, resp2) = try await URLSession.shared.data(for: req2)
-            guard let http2 = resp2 as? HTTPURLResponse, (200..<300).contains(http2.statusCode) else {
-                throw URLError(.badServerResponse)
-            }
-            guard let uiImage = UIImage(data: pngData) else {
-                throw URLError(.cannotDecodeContentData)
-            }
-
-            self.image = uiImage
-            self.lastUpdated = Date()
+            self.image = UIImage(data: pngData)
         } catch {
-            print("Image fetch failed:", error)
+            print("Access code fetch failed:", error)
         }
     }
 }
@@ -98,7 +78,7 @@ struct ContentView: View {
                 ProgressView(value: timeRemaining, total: reloadInterval)
                     .progressViewStyle(LinearProgressViewStyle())
             }
-            .padding(.horizontal, 50)
+            .padding(.horizontal, 60)
         }
         .ignoresSafeArea(.all)
         .task {

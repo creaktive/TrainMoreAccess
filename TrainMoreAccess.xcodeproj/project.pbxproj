@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		60B2E43F2E570C17003A2747 /* QRCode in Frameworks */ = {isa = PBXBuildFile; productRef = 60B2E43E2E570C17003A2747 /* QRCode */; };
 		60F91C522E4CFF200055B974 /* TrainMoreAccess Watch App.app in Embed Watch Content */ = {isa = PBXBuildFile; fileRef = 60F91C512E4CFF200055B974 /* TrainMoreAccess Watch App.app */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 /* End PBXBuildFile section */
 
@@ -52,6 +53,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				60B2E43F2E570C17003A2747 /* QRCode in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -114,6 +116,7 @@
 			);
 			name = "TrainMoreAccess Watch App";
 			packageProductDependencies = (
+				60B2E43E2E570C17003A2747 /* QRCode */,
 			);
 			productName = "TrainMoreAccess Watch App";
 			productReference = 60F91C512E4CFF200055B974 /* TrainMoreAccess Watch App.app */;
@@ -146,6 +149,9 @@
 			);
 			mainGroup = 60F91C442E4CFF200055B974;
 			minimizedProjectReferenceProxies = 1;
+			packageReferences = (
+				60B2E43D2E570C17003A2747 /* XCRemoteSwiftPackageReference "qrcode" */,
+			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 60F91C4C2E4CFF200055B974 /* Products */;
 			projectDirPath = "";
@@ -432,6 +438,25 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		60B2E43D2E570C17003A2747 /* XCRemoteSwiftPackageReference "qrcode" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/dagronf/qrcode.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 27.11.0;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		60B2E43E2E570C17003A2747 /* QRCode */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 60B2E43D2E570C17003A2747 /* XCRemoteSwiftPackageReference "qrcode" */;
+			productName = QRCode;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = 60F91C452E4CFF200055B974 /* Project object */;
 }
