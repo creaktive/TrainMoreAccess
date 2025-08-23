@@ -30,6 +30,8 @@ final class ImageLoader: ObservableObject {
     }
 
     func fetch() async {
+        self.image = nil
+
         var req1 = URLRequest(url: URL(string: API_ENDPOINT)!)
         req1.httpMethod = "GET"
         req1.cachePolicy = .reloadIgnoringLocalCacheData
@@ -100,10 +102,19 @@ struct ContentView: View {
             await loader.fetch()
             timeRemaining = reloadInterval
         }
+        .onTapGesture {
+            updateLoaderTokens()
+            Task {
+                await loader.fetch()
+                timeRemaining = reloadInterval
+            }
+        }
         .onReceive(timer) { _ in
             updateLoaderTokens()
-            Task { await loader.fetch() }
-            timeRemaining = reloadInterval
+            Task {
+                await loader.fetch()
+                timeRemaining = reloadInterval
+            }
         }
         .onReceive(progressTimer) { _ in
             if timeRemaining > 0 {
